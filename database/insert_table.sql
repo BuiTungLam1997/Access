@@ -1,0 +1,1 @@
+INSERT INTO `access`.`device` (`id`, `information`, `siteid`, `username`) VALUES ('Lap005', 'I7-5300M , 512GB,16GB', '1', 'Kho IT');
