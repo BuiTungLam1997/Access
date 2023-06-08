@@ -7,13 +7,19 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@include file="/common/taglib.jsp" %>
+<c:url var="APIurl" value="/api-admin-device"/>
+<c:url var="DeviceURL" value="/admin-device-list">
+    <c:param name="page" value="1"></c:param>
+    <c:param name="maxPageItem" value="3"></c:param>
+    <c:param name="type" value="list"></c:param>
+</c:url>
 <html>
 <head>
     <title>Chinh sua bai viet</title>
 </head>
 <body>
-    <div class="main-content">
-        <form action="<c:url value="/admin-device-list"/>" id="formSubmit" method="get">
+<div class="main-content">
+    <form action="<c:url value="/admin-device-list"/>" id="formSubmit" method="get">
         <div class="main-content-inner">
             <div class="breadcrumbs ace-save-state" id="breadcrumbs">
                 <ul class="breadcrumb">
@@ -26,6 +32,11 @@
             <div class="page-content">
                 <div class="row">
                     <div class="col-xs-12">
+                        <c:if test="${not empty messageResponse}">
+                            <div class="alert alert-${alert}">
+                                    ${messageResponse}
+                            </div>
+                        </c:if>
                         <div class="row">
                             <div class="col-xs-12">
                                 <div class="table-responsive">
@@ -34,7 +45,8 @@
                                             <a flag="info"
                                                class="dt-button buttons-colvis btn btn-white btn-primary btn-bold"
                                                data-toggle="tooltip"
-                                               title='Thêm bài viết' href='<c:url value="/admin-device-list?type=edit"/>'>
+                                               title='Thêm bài viết'
+                                               href='<c:url value="/admin-device-list?type=edit"/>'>
 															<span>
 																<i class="fa fa-plus-circle bigger-110 purple"></i>
 															</span>
@@ -51,14 +63,11 @@
                                     <table class="table table-bordered">
                                         <thead>
                                         <tr>
+                                            <th><input type="checkbox" id="checkAll"></th>
                                             <th>id</th>
                                             <th>information</th>
                                             <th>history</th>
                                             <th>siteid</th>
-                                            <th>createddate</th>
-                                            <th>createdby</th>
-                                            <th>modifieddate</th>
-                                            <th>modifiedby</th>
                                             <th>username</th>
                                             <th>Thao tác</th>
                                         </tr>
@@ -66,14 +75,12 @@
                                         <tbody>
                                         <c:forEach var="item" items="${model.listResult}">
                                             <tr>
+                                                <td><input type="checkbox" id="checkbox_${item.id}" value="${item.id}">
+                                                </td>
                                                 <td>${item.id}</td>
                                                 <td>${item.information}</td>
                                                 <td>${item.history}</td>
                                                 <td>${item.siteid}</td>
-                                                <td>${item.createddate}</td>
-                                                <td>${item.createdby}</td>
-                                                <td>${item.modifieddate}</td>
-                                                <td>${item.modifiedby}</td>
                                                 <td>${item.userName}</td>
                                                 <td>
                                                     <c:url var="editURL" value="/admin-device-list">
@@ -100,8 +107,8 @@
                 </div>
             </div>
         </div>
-        </form>
-    </div><!-- /.main-content -->
+    </form>
+</div><!-- /.main-content -->
 
 <script type="text/javascript">
     var totalPages = ${model.totalPage};
@@ -113,7 +120,7 @@
             visiblePages: 3,
             startPage: currentPage,
             onPageClick: function (event, page) {
-                if(currentPage!=page){
+                if (currentPage != page) {
                     $('#maxPageItem').val(limit);
                     $('#page').val(page);
                     $('#type').val('list');
@@ -122,6 +129,29 @@
             }
         });
     });
+    $('#btnDelete').click(function () {
+        var data = {};
+        var dataArray = $('tbody input[type=checkbox]:checked').map(function () {
+            return $(this).val();
+        }).get();
+        data ['ids'] = dataArray;
+        deleteDevice(data);
+    });
+
+    function deleteDevice(data) {
+        $.ajax({
+            url: '${APIurl}',
+            type: 'DELETE',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function (result) {
+                window.location.href = '${DeviceURL}&messgae=delete_success';
+            },
+            error: function (error) {
+                window.location.href = '${DeviceURL}&message=error_system';
+            },
+        });
+    }
 </script>
 </body>
 </html>

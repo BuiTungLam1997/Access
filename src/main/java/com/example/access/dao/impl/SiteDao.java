@@ -11,4 +11,18 @@ public class SiteDao extends AbstractDAO implements ISiteDAO {
         String sql = "SELECT * FROM site";
        return query(sql,new SiteMapper());
     }
+
+    @Override
+    public SiteModel findOne(String siteid) {
+        String sql = "SELECT * FROM site WHERE id = ?";
+        List<SiteModel> siteModels = query(sql, new SiteMapper(), siteid);
+        return siteModels.isEmpty() ? null : siteModels.get(0);
+    }
+
+    @Override
+    public SiteModel findOneByCode(String code) {
+        String sql = "SELECT * FROM site WHERE code = ?";
+        List<SiteModel> siteModels = query(sql, new SiteMapper(), code);
+        return siteModels.isEmpty() ? null : siteModels.get(0);
+    }
 }

@@ -1,15 +1,18 @@
 package com.example.access.mapper;
 
+import com.example.access.model.CloneDeviceModel;
 import com.example.access.model.DeviceModel;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class DeviceMapper implements RowMapper<DeviceModel> {
+public class CloneDeviceMapper implements RowMapper<CloneDeviceModel> {
+
     @Override
-    public DeviceModel mapRow(ResultSet resultSet) {
+    public CloneDeviceModel mapRow(ResultSet resultSet) {
+
         try {
-            DeviceModel deviceModel = new DeviceModel();
+            CloneDeviceModel deviceModel = new CloneDeviceModel();
             deviceModel.setId(resultSet.getString("id"));
             deviceModel.setInformation(resultSet.getString("information"));
             deviceModel.setHistory(resultSet.getString("history"));
@@ -17,7 +20,6 @@ public class DeviceMapper implements RowMapper<DeviceModel> {
             deviceModel.setUserName(resultSet.getString("username"));
             deviceModel.setCreatedby(resultSet.getString("createdby"));
             deviceModel.setCreateddate(resultSet.getTimestamp("createddate"));
-            deviceModel.setIsDelete(resultSet.getInt("isDelete"));
             deviceModel.setVersion(resultSet.getInt("version"));
             if (deviceModel.getModifieddate() != null) {
                 deviceModel.setModifieddate(resultSet.getTimestamp("modifieddate"));
@@ -29,6 +31,5 @@ public class DeviceMapper implements RowMapper<DeviceModel> {
         } catch (SQLException e) {
             return null;
         }
-
     }
 }

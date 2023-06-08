@@ -10,7 +10,7 @@ public interface IDeviceDAO extends GenericDao<DeviceModel>{
     String save(DeviceModel deviceModel);
     DeviceModel findOne(String id);
     void update(DeviceModel updateDevice);
-    void delete(String id);
+    void delete(DeviceModel deviceModel);
     List<DeviceModel> findAll(Pageble pageble);
     Integer getTotalItemDevice();
     String getMaxId();

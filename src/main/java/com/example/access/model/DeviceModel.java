@@ -9,6 +9,16 @@ public class DeviceModel extends AbstractModel<DeviceModel> {
     private String sortName;
     private String sortBy;
     private Integer isDelete;
+    private Integer version;
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+
     private String siteCode;
 
     public String getSiteCode() {

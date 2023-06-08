@@ -8,13 +8,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@include file="/common/taglib.jsp" %>
 <c:url var="APIurl" value="/api-admin-device"/>
-<c:url var="NEWurl" value="/admin-device-list">
+<c:url var="DeviceURL" value="/admin-device-list">
     <c:param name="page" value="1"></c:param>
     <c:param name="maxPageItem" value="3"></c:param>
-    <%--    <c:param name="sortName" value="title"></c:param>--%>
-    <%--    <c:param name="sortBy" value="asc"></c:param>--%>
     <c:param name="type" value="list"></c:param>
-    <%--    <c:param name="message" value="delete_success"></c:param>--%>
 </c:url>
 <html>
 <head>
@@ -70,11 +67,20 @@
                         <div class="form-group">
                             <label class="col-sm-3 control-label no-padding-right">Site</label>
                             <div class="col-sm-9">
-                                <select class="form-control" id="sideCode" name="sideCode">
-                                    <option>Chọn khu vực</option>
-                                    <c:forEach var="item" items="${side}">
-                                        <option value="${item.code}">${item.name}</option>
-                                    </c:forEach>
+                                <select class="form-control" id="siteCode" name="siteCode">
+                                    <c:if test="${empty model.siteCode}">
+                                        <option>Chọn khu vực</option>
+                                        <c:forEach var="item" items="${side}">
+                                            <option value="${item.code}">${item.name}</option>
+                                        </c:forEach>
+                                    </c:if>
+                                    <c:if test="${not empty model.siteCode}">
+                                        <c:forEach var="item" items="${side}">
+                                            <option value="${item.code}"
+                                                    <c:if test="${item.code == model.siteCode}">selected="selected"</c:if>>${item.name}</option>
+                                            <option>Chọn khu vực</option>
+                                        </c:forEach>
+                                    </c:if>
                                 </select>
                             </div>
                         </div>
@@ -85,13 +91,6 @@
                             <div class="col-sm-9">
                                 <textarea rows="" cols="" id="userName" name="userName"
                                           style="width: 820px;height: 175px">${model.userName}</textarea>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label no-padding-right">Trạng thái</label>
-                            <div class="col-sm-9">
-                                <textarea rows="" cols="" id="isDelete" name="isDelete"
-                                          style="width: 820px;height: 175px">${model.isDelete}</textarea>
                             </div>
                         </div>
                         <br/>
@@ -109,11 +108,60 @@
                             </div>
                         </div>
                         <input type="hidden" value="${model.id}" id="id" name="id">
+                        <input type="hidden" value="0" id="isDelete" name="isDelete">
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<script>
+    $('#btnAddOrUpdateNew').click(function (e) {
+        e.preventDefault();
+        var data = {};
+        var formData = $('#formSubmit').serializeArray();
+        $.each(formData, function (i, v) {
+            data["" + v.name + ""] = v.value;
+        });
+        var id = $('#id').val();
+        if (id == "") {
+            addDevice(data);
+        } else {
+            updateDevice(data);
+        }
+    });
+
+    function addDevice(data) {
+        $.ajax({
+            url:'${APIurl}',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            dataType: 'json',
+            success: function (result) {
+                window.location.href = '${DeviceURL}&id='+result.id+'&message=insert_success';
+            },
+            error: function (error) {
+                window.location.href = '${DeviceURL}&message=error_system';
+            },
+        });
+    }
+
+    function updateDevice(data) {
+        $.ajax({
+            url: '${APIurl}',
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            dataType: 'json',
+            success: function (result) {
+                window.location.href = '${DeviceURL}&id='+result.id+'&message=update_success';
+            },
+            error: function (error) {
+                window.location.href = '${DeviceURL}&message=error_system';
+            },
+        });
+    }
+</script>
 </body>
 </html>

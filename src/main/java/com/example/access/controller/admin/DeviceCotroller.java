@@ -43,6 +43,27 @@ public class DeviceCotroller extends HttpServlet {
             }
             view = "/views/admin/device/edit.jsp";
         }
+        if(request.getParameter("message")!=null){
+            String message ;
+            String messageResponse="";
+            String alert="";
+            message = request.getParameter("message");
+            if(message.equals("insert_success")){
+                messageResponse = "Insert Success";
+                alert = "success";
+            } else if(message.equals("update_success")){
+                messageResponse = "Update Success";
+                alert = "success";
+            } else if(message.equals("delete_success")){
+                messageResponse = "Delete Success";
+                alert = "success";
+            } else if(message.equals("error_system")){
+                messageResponse = "Error!";
+                alert = "danger";
+            }
+            request.setAttribute("messageResponse",messageResponse);
+            request.setAttribute("alert",alert);
+        }
         request.setAttribute("side",siteSevice.findAll());
         request.setAttribute(SystemConstant.MODEL, deviceModel);
         RequestDispatcher rd = request.getRequestDispatcher(view);

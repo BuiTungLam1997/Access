@@ -16,4 +16,9 @@ public class SiteService implements ISiteSevice {
     public List<SiteModel> findAll() {
         return siteDAO.findAll();
     }
+
+    @Override
+    public SiteModel findOne(String siteid) {
+        return siteDAO.findOne(siteid);
+    }
 }
