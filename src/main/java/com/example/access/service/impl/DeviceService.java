@@ -2,25 +2,27 @@ package com.example.access.service.impl;
 
 import com.example.access.dao.IDeviceDAO;
 import com.example.access.dao.ISiteDAO;
-import com.example.access.dao.impl.DeviceDao;
 import com.example.access.model.CloneDeviceModel;
 import com.example.access.model.DeviceModel;
 import com.example.access.model.SiteModel;
+import com.example.access.model.UserModel;
 import com.example.access.paging.Pageble;
 import com.example.access.service.ICloneDeviceService;
-import com.example.access.service.IDeviceSevice;
+import com.example.access.service.IDeviceService;
+import com.example.access.ultis.SessionUtils;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
 import java.util.List;
 
-public class DeviceService implements IDeviceSevice {
+public class DeviceService implements IDeviceService {
     @Inject
     private IDeviceDAO deviceDAO;
     @Inject
     private ISiteDAO siteDAO;
     @Inject
-    private ICloneDeviceService cloneDeviceServicel;
+    private ICloneDeviceService cloneDeviceService;
 
     @Override
     public List<DeviceModel> findById(String id) {
@@ -28,14 +30,33 @@ public class DeviceService implements IDeviceSevice {
     }
 
     @Override
-    public DeviceModel save(DeviceModel deviceModel) {
+    public DeviceModel save(DeviceModel deviceModel, HttpServletRequest request) {
+        saveUtils(deviceModel, request);
+        String deviceId = deviceDAO.save(deviceModel);
+        return deviceDAO.findOne(deviceId);
+    }
+
+    private void saveUtils(DeviceModel deviceModel, HttpServletRequest request) {
         deviceModel.setCreateddate(new Timestamp(System.currentTimeMillis()));
-        //lay id site
+        deviceModel.setSiteid(getIdSite(deviceModel));
+        deviceModel.setId(getIdAuto());
+        if (getFullName(request) != null) {
+            deviceModel.setCreatedby(getFullName(request));
+        } else deviceModel.setCreatedby("CALL FROM POSTMAN");
+    }
+
+    private String getIdSite(DeviceModel deviceModel) {
+        if (deviceModel.getSiteCode() == null) {
+            return null;
+        }
         SiteModel siteModel = siteDAO.findOneByCode(deviceModel.getSiteCode());
-        deviceModel.setSiteid(siteModel.getId());
-        //id auto increment
+        return siteModel.getId();
+    }
+
+    private String getIdAuto() {
         String idMax = deviceDAO.getMaxId();
-        String idString = "", idNumber = "";
+        String idString = "";
+        String idNumber = "";
         for (int i = 0; i < 3; i++) {
             idString += idMax.charAt(i);
         }
@@ -45,42 +66,54 @@ public class DeviceService implements IDeviceSevice {
         int idAdd = Integer.parseInt(idNumber);
         idAdd++;
         idNumber = String.valueOf(idAdd);
-        deviceModel.setId(idString + idNumber);
-        deviceModel.setVersion(1);
-        String deviceId = deviceDAO.save(deviceModel);
-        return deviceDAO.findOne(deviceId);
+        return idString + idNumber;
     }
 
     @Override
-    public DeviceModel update(DeviceModel deviceModel) {
+    public DeviceModel update(DeviceModel deviceModel, HttpServletRequest request) {
         DeviceModel oldDevice = deviceDAO.findOne(deviceModel.getId());
-        //luu sang 1 db clone
+
+        saveCloneDevice(oldDevice);
+
+        updateUtils(deviceModel, oldDevice, request);
+
+        deviceDAO.update(deviceModel);
+        return deviceDAO.findOne(deviceModel.getId());
+    }
+
+    private void updateUtils(DeviceModel deviceModel, DeviceModel oldDevice, HttpServletRequest request) {
+        deviceModel.setCreateddate(oldDevice.getCreateddate());
+        deviceModel.setCreatedby(oldDevice.getCreatedby());
+        deviceModel.setSiteid(getIdSite(deviceModel));
+
+        deviceModel.setVersion(versionAuto(deviceModel));
+        deviceModel.setModifieddate(new Timestamp(System.currentTimeMillis()));
+        deviceModel.setModifiedby(getFullName(request));
+        deviceModel.setVersion(versionAuto(oldDevice));
+    }
+
+    public Integer versionAuto(DeviceModel oldDevice) {
+        Integer version = oldDevice.getVersion();
+        return ++version;
+    }
+
+    private void saveCloneDevice(DeviceModel oldDevice) {
         CloneDeviceModel clone = new CloneDeviceModel();
+
         clone.setId(oldDevice.getId());
         clone.setHistory(oldDevice.getHistory());
         clone.setInformation(oldDevice.getInformation());
+
         clone.setVersion(oldDevice.getVersion());
         clone.setUserName(oldDevice.getUserName());
         clone.setSiteid(oldDevice.getSiteid());
+
         clone.setCreatedby(oldDevice.getCreatedby());
         clone.setCreateddate(oldDevice.getCreateddate());
         clone.setModifiedby(oldDevice.getModifiedby());
         clone.setModifieddate(oldDevice.getModifieddate());
-        cloneDeviceServicel.save(clone);
-        //
-        deviceModel.setCreateddate(oldDevice.getCreateddate());
-        deviceModel.setCreatedby(oldDevice.getCreatedby());
-        deviceModel.setModifieddate(new Timestamp(System.currentTimeMillis()));
-        //lay id site
-        SiteModel siteModel = siteDAO.findOneByCode(deviceModel.getSiteCode());
-        deviceModel.setSiteid(siteModel.getId());
-        //tang version
-        Integer version = oldDevice.getVersion();
-        version++;
-        deviceModel.setVersion(version);
-        //
-        deviceDAO.update(deviceModel);
-        return deviceDAO.findOne(deviceModel.getId());
+
+        cloneDeviceService.save(clone);
     }
 
     @Override
@@ -108,5 +141,14 @@ public class DeviceService implements IDeviceSevice {
         SiteModel siteModel = siteDAO.findOne(deviceModel.getSiteid());
         deviceModel.setSiteCode(siteModel.getCode());
         return deviceModel;
+    }
+
+    private String getFullName(HttpServletRequest request) {
+        UserModel userModel = (UserModel) SessionUtils.getInstance().getValue(request, "USERMODEL");
+        if (userModel == null) {
+            return null;
+        }
+        String fullName = userModel.getFullName();
+        return fullName;
     }
 }

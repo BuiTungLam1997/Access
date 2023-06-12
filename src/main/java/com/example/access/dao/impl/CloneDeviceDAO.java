@@ -20,9 +20,9 @@ public class CloneDeviceDAO extends AbstractDAO<CloneDeviceModel> implements ICl
         StringBuilder sql = new StringBuilder("INSERT INTO clonedevice ");
         sql.append(" (id,information,history ,siteid , username , createdby , createddate ,modifiedby,modifieddate ,version) ");
         sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?)");
-        return insert(sql.toString(),clone.getId(),clone.getId(),clone.getInformation(),clone.getHistory(),clone.getSiteid()
-                ,clone.getUserName(),clone.getCreatedby(),clone.getCreateddate(),clone.getModifiedby(),
-                clone.getModifieddate(),clone.getVersion());
+        return insert(sql.toString(), clone.getId(), clone.getId(), clone.getInformation(), clone.getHistory(), clone.getSiteid()
+                , clone.getUserName(), clone.getCreatedby(), clone.getCreateddate(), clone.getModifiedby(),
+                clone.getModifieddate(), clone.getVersion());
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.example.access.controller.admin;
 
-import com.example.access.constant.SystemConstant;
 import com.example.access.model.UserModel;
 import com.example.access.service.IUserSevice;
 import com.example.access.ultis.FormUltis;
@@ -17,52 +16,63 @@ import java.util.ResourceBundle;
 public class HomeController extends HttpServlet {
     ResourceBundle resourceBundle = ResourceBundle.getBundle("message");
     @Inject
-    private IUserSevice userSevice;
+    private IUserSevice userService;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
         String view = "";
-        if (action != null) {
-            if (action.equals("login")) {
-                String messsage = request.getParameter("message");
-                String alert = request.getParameter("alert");
-                if(messsage!=null&&alert!=null){
-                    request.setAttribute("message",resourceBundle.getString(messsage));
-                    request.setAttribute("alert",alert);
-                }
-                view = "/views/login.jsp";
-                RequestDispatcher rd = request.getRequestDispatcher(view);
-                rd.forward(request, response);
-            } else if (action.equals("logout")) {
-                SessionUtils.getInstance().removeValue(request, "USERMODEL");
-                response.sendRedirect(request.getContextPath() + "/trang-chu");
-            }
-        } else {
+        if (action == null) {
             view = "/views/admin/home.jsp";
             RequestDispatcher rd = request.getRequestDispatcher(view);
             rd.forward(request, response);
+            return;
+        }
+
+        String url = request.getContextPath();
+        if (action.equals("login")) {
+            checkMessage(request);
+            view = "/views/login.jsp";
+            RequestDispatcher rd = request.getRequestDispatcher(view);
+            rd.forward(request, response);
+        } else {
+            SessionUtils.getInstance().removeValue(request, "USERMODEL");
+            response.sendRedirect(request.getContextPath() + "/trang-chu");
         }
     }
+
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-        if (action != null) {
-            if (action.equals("login")) {
-                UserModel userModel = FormUltis.toModel(UserModel.class, request);
-                userModel = userSevice.findCheckUser(userModel);
-                if (userModel != null) {
-                    SessionUtils.getInstance().putValue(request, "USERMODEL",userModel);
-                    if (userModel.getRole().getCode().equals("user")) {
-                        response.sendRedirect(request.getContextPath() + "/trang-chu");
-                    } else if (userModel.getRole().getCode().equals("admin")) {
-                        response.sendRedirect(request.getContextPath() + "/admin-home");
-                    }
-                } else {
-                    response.sendRedirect(request.getContextPath() + "/dang-nhap?action=login&message=username_password_invalid&alert=danger");
-                }
+        if (action == null) {
+            return;
+        }
+
+        String url = request.getContextPath();
+        if (action.equals("login")) {
+            UserModel userModel = FormUltis.toModel(UserModel.class, request);
+            userModel = userService.findCheckUser(userModel);
+
+            if (userModel != null && userModel.isUser()) {
+                SessionUtils.getInstance().putValue(request, "USERMODEL", userModel);
+                url += "/trang-chu";
+            } else if (userModel != null && userModel.isAdmin()) {
+                SessionUtils.getInstance().putValue(request, "USERMODEL", userModel);
+                url += "/admin-home";
+            } else {
+                url += "/dang-nhap?action=login&message=username_password_invalid&alert=danger";
             }
+            response.sendRedirect(url);
+        }
+    }
+    public void checkMessage(HttpServletRequest request) {
+        String message = request.getParameter("message");
+        String alert = request.getParameter("alert");
+        if (message != null && alert != null) {
+            request.setAttribute("message", resourceBundle.getString(message));
+            request.setAttribute("alert", alert);
         }
     }
 }
+

@@ -1,11 +1,13 @@
 package com.example.access.model;
 
-public class UserModel extends AbstractModel<UserModel>{
+import com.example.access.constant.SystemConstant;
+
+public class UserModel extends AbstractModel<UserModel> {
     private String userName;
     private String password;
     private String fullName;
-    private String status ;
-    private RoleModel role =new RoleModel();
+    private String status;
+    private RoleModel role = new RoleModel();
 
     public RoleModel getRole() {
         return role;
@@ -55,5 +57,13 @@ public class UserModel extends AbstractModel<UserModel>{
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public boolean isUser() {
+        return getRole().getCode().equals(SystemConstant.USER);
+    }
+
+    public boolean isAdmin() {
+        return getRole().getCode().equals(SystemConstant.ADMIN);
     }
 }

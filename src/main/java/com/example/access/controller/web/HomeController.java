@@ -1,10 +1,8 @@
 package com.example.access.controller.web;
 
 import com.example.access.model.DeviceModel;
-import com.example.access.service.IDeviceSevice;
+import com.example.access.service.IDeviceService;
 import com.example.access.service.ISiteSevice;
-import com.example.access.service.impl.DeviceService;
-import com.example.access.service.impl.SiteService;
 
 import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
@@ -20,7 +18,7 @@ public class HomeController extends HttpServlet {
     @Inject
     private ISiteSevice siteSevice;
     @Inject
-    private IDeviceSevice deviceSevice;
+    private IDeviceService deviceSevice;
 
 
     @Override

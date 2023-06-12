@@ -1,5 +1,7 @@
 package com.example.access.model;
 
+import com.example.access.constant.SystemConstant;
+
 public class DeviceModel extends AbstractModel<DeviceModel> {
 
     private String information;
@@ -9,7 +11,8 @@ public class DeviceModel extends AbstractModel<DeviceModel> {
     private String sortName;
     private String sortBy;
     private Integer isDelete;
-    private Integer version;
+    private Integer version = 1;
+    private String siteCode;
 
     public Integer getVersion() {
         return version;
@@ -19,7 +22,6 @@ public class DeviceModel extends AbstractModel<DeviceModel> {
         this.version = version;
     }
 
-    private String siteCode;
 
     public String getSiteCode() {
         return siteCode;
@@ -83,5 +85,13 @@ public class DeviceModel extends AbstractModel<DeviceModel> {
 
     public void setSiteid(String siteid) {
         this.siteid = siteid;
+    }
+
+    public boolean isList() {
+        return getType().equals(SystemConstant.LIST);
+    }
+
+    public boolean isEdit() {
+        return getType().equals(SystemConstant.EDIT);
     }
 }

@@ -12,6 +12,7 @@ import java.util.List;
 public class DeviceDao extends AbstractDAO<DeviceModel> implements IDeviceDAO {
     @Inject
     private ISiteDAO siteDAO;
+
     @Override
     public List<DeviceModel> findById(String id) {
         String sql = "SELECT * FROM device WHERE id = ?";
@@ -20,10 +21,10 @@ public class DeviceDao extends AbstractDAO<DeviceModel> implements IDeviceDAO {
 
     @Override
     public String save(DeviceModel deviceModel) {
-        String sql = " INSERT INTO device (id, information, siteid, username ,history,createddate ,createdby,isDelete,version) VALUES (?,?,?,?,?,?,?,?)";
+        String sql = " INSERT INTO device (id, information, siteid, username ,history,createddate ,createdby,isDelete,version) VALUES (?,?,?,?,?,?,?,?,?)";
         return insert(sql, deviceModel.getId(), deviceModel.getId(), deviceModel.getInformation(), deviceModel.getSiteid(),
                 deviceModel.getUserName(), deviceModel.getHistory(), deviceModel.getCreateddate(),
-                deviceModel.getCreatedby(), deviceModel.getIsDelete(),deviceModel.getVersion());
+                deviceModel.getCreatedby(), deviceModel.getIsDelete(), deviceModel.getVersion());
     }
 
     @Override
@@ -36,12 +37,19 @@ public class DeviceDao extends AbstractDAO<DeviceModel> implements IDeviceDAO {
     @Override
     public void update(DeviceModel updateDevice) {
         StringBuilder sql = new StringBuilder("UPDATE device ");
-        sql.append(" SET information = ? , history = ? , siteid = ? ,");
-        sql.append(" username = ? ,version = ? ,createddate = ? ,createdby = ? ,");
-        sql.append(" modifieddate = ? ,modifiedby = ?");
+        sql.append(" SET ");
+        sql.append(" information = ?");
+        sql.append(" ,history = ?");
+        sql.append(", siteid = ?");
+        sql.append(" ,username = ?");
+        sql.append(" ,version = ?");
+        sql.append(" ,createddate = ?");
+        sql.append(",createdby = ?");
+        sql.append(" ,modifieddate = ?");
+        sql.append(" ,modifiedby =  ?");
         sql.append(" WHERE id = ?");
         update(sql.toString(), updateDevice.getInformation(), updateDevice.getHistory(),
-                updateDevice.getSiteid(), updateDevice.getUserName(),updateDevice.getVersion(), updateDevice.getCreateddate()
+                updateDevice.getSiteid(), updateDevice.getUserName(), updateDevice.getVersion(), updateDevice.getCreateddate()
                 , updateDevice.getCreatedby(), updateDevice.getModifieddate(), updateDevice.getModifiedby()
                 , updateDevice.getId());
     }

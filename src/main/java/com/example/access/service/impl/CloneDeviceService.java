@@ -12,6 +12,7 @@ import java.util.List;
 public class CloneDeviceService implements ICloneDeviceService {
     @Inject
     private ICloneDeviceDAO cloneDeviceDAO;
+
     @Override
     public List<CloneDeviceModel> findById(String id) {
         return cloneDeviceDAO.findById(id);

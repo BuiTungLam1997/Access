@@ -133,13 +133,13 @@
 
     function addDevice(data) {
         $.ajax({
-            url:'${APIurl}',
+            url: '${APIurl}',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(data),
             dataType: 'json',
             success: function (result) {
-                window.location.href = '${DeviceURL}&id='+result.id+'&message=insert_success';
+                window.location.href = '${DeviceURL}&id=' + result.id + '&message=insert_success';
             },
             error: function (error) {
                 window.location.href = '${DeviceURL}&message=error_system';
@@ -155,7 +155,7 @@
             data: JSON.stringify(data),
             dataType: 'json',
             success: function (result) {
-                window.location.href = '${DeviceURL}&id='+result.id+'&message=update_success';
+                window.location.href = '${DeviceURL}&id=' + result.id + '&message=update_success';
             },
             error: function (error) {
                 window.location.href = '${DeviceURL}&message=error_system';
