@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AbstractModel<T> {
-    private String id;
     private String[] ids;
+    private String id;
     private Integer page;
     private Integer maxPageItem;
     private Integer totalPage;
