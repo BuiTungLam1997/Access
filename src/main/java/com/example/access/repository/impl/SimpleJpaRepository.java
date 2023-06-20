@@ -8,12 +8,11 @@ import com.example.access.mapper.RowMapperImpl;
 import com.example.access.paging.Pageble;
 import com.example.access.repository.Repository;
 import com.example.access.repository.entity.AbstractEntity;
+import com.example.access.repository.entity.DeviceEntity;
 
 import java.lang.reflect.Field;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public abstract class SimpleJpaRepository<E extends AbstractEntity, ID> implements Repository<E, ID> {
 
@@ -77,13 +76,16 @@ public abstract class SimpleJpaRepository<E extends AbstractEntity, ID> implemen
     }
 
     @Override
-    public List<E> findBy(String field, String value) {
+    public List<E> findBy(HashMap hashMap) {
+
+        Set<String> keySet = hashMap.keySet();
         List<E> result = new ArrayList<>();
         StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM ");
         sqlBuilder.append(getTableName()).append(" ");
         sqlBuilder.append("WHERE").append(" ");
-        sqlBuilder.append(field).append(" = ");
-        sqlBuilder.append(value);
+        for (String key : keySet) {
+            sqlBuilder.append(key).append("= ").append(hashMap.get(key));
+        }
 
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
@@ -91,8 +93,7 @@ public abstract class SimpleJpaRepository<E extends AbstractEntity, ID> implemen
         try (Connection connection = getConnection()) {
             preparedStatement = connection.prepareStatement(sqlBuilder.toString());
             resultSet = preparedStatement.executeQuery();
-            while (resultSet.next())
-            {
+            while (resultSet.next()) {
                 result.add(mapper.mapRowEntity(resultSet, zclass));
             }
             return result;
@@ -235,5 +236,26 @@ public abstract class SimpleJpaRepository<E extends AbstractEntity, ID> implemen
         throw new RuntimeException("Id not found");
     }
 
+    public HashMap getFieldAndValue(Column column, Object value, E e) {
+        HashMap hs = new HashMap();
+        try {
+            Field[] fields = DeviceEntity.class.getDeclaredFields();
+            for (Field field : fields) {
+                column = field.getAnnotation(Column.class);
+                if (column == null) {
+                    continue;
+                }
+                field.setAccessible(true);
+                value = field.get(e);
+                if (value != null) {
+                    break;
+                }
+            }
+        } catch (IllegalArgumentException | IllegalAccessException e1) {
+            throw new RuntimeException(e1);
+        }
+        hs.put(column,value);
+        return hs;
+    }
 
 }

@@ -4,6 +4,7 @@ import com.example.access.paging.Pageble;
 import com.example.access.repository.entity.AbstractEntity;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public interface Repository<E extends AbstractEntity, Id> {
@@ -14,7 +15,7 @@ public interface Repository<E extends AbstractEntity, Id> {
 
     }
 
-    default List<E> findBy(String field, String value) {
+    default List<E> findBy(HashMap hashMap) {
         return null;
     }
 
