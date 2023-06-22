@@ -53,7 +53,7 @@ public class DeviceService implements IDeviceService {
         return siteModel.getId();
     }
 
-    private String getIdAuto() {
+    public String getIdAuto() {
         String idMax = deviceDAO.getMaxId();
         String idString = "";
         String idNumber = "";

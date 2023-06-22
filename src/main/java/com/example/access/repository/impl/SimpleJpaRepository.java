@@ -51,6 +51,116 @@ public abstract class SimpleJpaRepository<E extends AbstractEntity, ID> implemen
         return e;
     }
 
+    @Override
+    public E save(E e) {
+        StringBuilder sqlBuilder = new StringBuilder("INSERT INTO ");
+        sqlBuilder.append(getTableName());
+        sqlBuilder.append("(").append(getColumn(e)).append(")");
+
+        sqlBuilder.append(" ");
+        sqlBuilder.append("VALUES").append("(");
+        sqlBuilder.append(getValue(e));
+        sqlBuilder.append(")");
+
+
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try (Connection connection = getConnection()) {
+            connection.setAutoCommit(false);
+            preparedStatement = connection.prepareStatement(sqlBuilder.toString());
+            preparedStatement.executeUpdate();
+            connection.commit();
+            return null;
+        } catch (Exception e1) {
+            throw new RuntimeException(e1);
+        } finally {
+            try {
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+                if (resultSet != null) {
+                    resultSet.close();
+                }
+            } catch (SQLException e1) {
+                throw new RuntimeException(e1);
+            }
+        }
+    }
+
+    private String getColumn(E e) {
+        StringBuilder columns = new StringBuilder("");
+        Field[] fields = zclass.getDeclaredFields();
+//        for (Field field : fields) {
+//            if (field.equals(fields)) {
+//                columns.append(",");
+//            }
+////            Id id = field.getDeclaredAnnotation(Id.class);
+////            if (id != null) {
+////                continue;
+////            }
+//            Column column = field.getDeclaredAnnotation(Column.class);
+//            if (column == null) {
+//                continue;
+//            }
+//            columns.append(column.name());
+//        }
+        for (int i = 0; i < fields.length; i++) {
+//            Id id = field.getDeclaredAnnotation(Id.class);
+//            if (id != null) {
+//                continue;
+//            }
+            Column column = fields[i].getDeclaredAnnotation(Column.class);
+            if (column == null) {
+                continue;
+            }
+            columns.append(column.name());
+            if (i < fields.length - 2) {
+                columns.append(",");
+            }
+        }
+        return columns.toString();
+    }
+
+    private String getValue(E e) {
+        StringBuilder values = new StringBuilder("");
+        try {
+            Field[] fields = zclass.getDeclaredFields();
+//            for (Field field : fields) {
+////                Id id = field.getDeclaredAnnotation(Id.class);
+////                if (id != null) {
+////                    continue;
+////                }
+//                Column column = field.getDeclaredAnnotation(Column.class);
+//                if (column == null) {
+//                    continue;
+//                }
+//                field.setAccessible(true);
+//                Object value = field.get(e);
+//                values.append(",").append(value);
+//            }value
+            for (int i = 0; i < fields.length; i++) {
+//            Id id = field.getDeclaredAnnotation(Id.class);
+//            if (id != null) {
+//                continue;
+//            }
+                Column column = fields[i].getDeclaredAnnotation(Column.class);
+                if (column == null) {
+                    continue;
+                }
+                fields[i].setAccessible(true);
+                Object value = fields[i].get(e);
+                values.append(value);
+                if (i < fields.length - 2) {
+                    values.append(",");
+                }
+            }
+        } catch (IllegalArgumentException | IllegalAccessException e1) {
+            throw new RuntimeException(e1);
+        }
+        return values.toString();
+    }
+
     private String setValue(E e) {
         StringBuilder setValue = new StringBuilder("");
         Field[] fields = zclass.getDeclaredFields();
@@ -254,7 +364,7 @@ public abstract class SimpleJpaRepository<E extends AbstractEntity, ID> implemen
         } catch (IllegalArgumentException | IllegalAccessException e1) {
             throw new RuntimeException(e1);
         }
-        hs.put(column,value);
+        hs.put(column, value);
         return hs;
     }
 
