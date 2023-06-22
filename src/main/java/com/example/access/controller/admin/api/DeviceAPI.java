@@ -43,9 +43,9 @@ public class DeviceAPI extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         apiUtils(request, response);
-        DeviceModel deviceModel = HttpUltis.of(request.getReader()).toModel(DeviceModel.class);
-        deviceModel = deviceService.save(deviceModel, request);
-        mapper.writeValue(response.getOutputStream(), deviceModel);
+        DeviceEntity deviceEntity = HttpUltis.of(request.getReader()).toModel(DeviceEntity.class);
+        deviceEntity = deviceRepository.save(deviceEntity);
+        mapper.writeValue(response.getOutputStream(), deviceEntity);
     }
 
     @Override
