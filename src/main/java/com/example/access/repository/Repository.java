@@ -19,16 +19,15 @@ public interface Repository<E extends AbstractEntity, Id> {
         return null;
     }
 
-    default E save(E entity) {
-        return entity;
+    default String save(E entity) {
+        return null;
     }
 
     default void deleteAll() {
 
     }
 
-    default E update(E e) {
-        return e;
+    default void update(E e) {
     }
 
     default List<E> findAll() {

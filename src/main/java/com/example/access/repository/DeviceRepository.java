@@ -8,5 +8,6 @@ public interface DeviceRepository extends Repository<DeviceEntity, String> {
 
     List<DeviceEntity> findBySiteCode(String siteCode);
     List<DeviceEntity> findByAnything(DeviceEntity deviceEntity);
+    DeviceEntity saveDevice(DeviceEntity deviceEntity);
 
 }

@@ -10,7 +10,6 @@ public class DeviceEntity extends AbstractEntity {
     @Column(name = "id")
     private String id;
     @Column(name = "information")
-
     private String information;
     @Column(name = "history")
     private String history;
@@ -19,7 +18,7 @@ public class DeviceEntity extends AbstractEntity {
     @Column(name = "username")
     private String userName;
     @Column(name = "isDelete")
-    private Integer isDelete;
+    private Integer isDelete = 0;
     @Column(name = "version")
     private Integer version = 1;
     private String siteCode;
