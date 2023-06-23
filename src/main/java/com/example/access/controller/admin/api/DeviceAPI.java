@@ -6,8 +6,6 @@ import com.example.access.paging.Pageble;
 import com.example.access.repository.DeviceRepository;
 import com.example.access.repository.entity.DeviceEntity;
 import com.example.access.service.IDeviceService;
-import com.example.access.service.IUserSevice;
-import com.example.access.sort.Sorter;
 import com.example.access.ultis.HttpUltis;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -25,8 +23,6 @@ import java.util.List;
 public class DeviceAPI extends HttpServlet {
     @Inject
     private DeviceRepository deviceRepository;
-    @Inject
-    private IDeviceService deviceService;
     ObjectMapper mapper = new ObjectMapper();
 
 
@@ -44,23 +40,23 @@ public class DeviceAPI extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         apiUtils(request, response);
         DeviceEntity deviceEntity = HttpUltis.of(request.getReader()).toModel(DeviceEntity.class);
-        deviceEntity = deviceRepository.save(deviceEntity);
+        deviceEntity = deviceRepository.saveDevice(deviceEntity);
         mapper.writeValue(response.getOutputStream(), deviceEntity);
     }
 
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         apiUtils(request, response);
-        DeviceModel updateDevice = HttpUltis.of(request.getReader()).toModel(DeviceModel.class);
-        updateDevice = deviceService.update(updateDevice, request);
+        DeviceEntity updateDevice = HttpUltis.of(request.getReader()).toModel(DeviceEntity.class);
+        deviceRepository.update(updateDevice);
         mapper.writeValue(response.getOutputStream(), updateDevice);
     }
 
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         apiUtils(request, response);
-        DeviceModel deleteDevice = HttpUltis.of(request.getReader()).toModel(DeviceModel.class);
-        deviceService.delete(deleteDevice.getIds());
+        String id = request.getParameter("id");
+        deviceRepository.deleteById(id);
         mapper.writeValue(response.getOutputStream(), "{}");
     }
 

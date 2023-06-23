@@ -1,7 +1,6 @@
 package com.example.access.repository.impl;
 
 import com.example.access.annatation.Column;
-import com.example.access.model.DeviceModel;
 import com.example.access.repository.DeviceRepository;
 import com.example.access.repository.SiteRepository;
 import com.example.access.repository.entity.DeviceEntity;
@@ -12,18 +11,17 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 
-import static sun.reflect.misc.FieldUtil.getField;
-
 
 public class DeviceRepositoryImpl extends SimpleJpaRepository<DeviceEntity, String> implements DeviceRepository {
 
+
     private SiteRepository siteRepository;
-    private DeviceEntity device;
+    @Inject
+    private DeviceRepository deviceRepository;
 
     public DeviceRepositoryImpl() {
         super(DeviceEntity.class);
     }
-
     @Override
     public List<DeviceEntity> findBySiteCode(String siteCode) {
         SiteEntity site = siteRepository.findByCode(siteCode);
@@ -60,6 +58,12 @@ public class DeviceRepositoryImpl extends SimpleJpaRepository<DeviceEntity, Stri
             return findBy(hs);
         }
         return null;
+    }
+
+    @Override
+    public DeviceEntity saveDevice(DeviceEntity deviceEntity) {
+        String id = deviceRepository.save(deviceEntity);
+        return findById(id);
     }
 
 }
